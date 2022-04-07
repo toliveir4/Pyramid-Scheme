@@ -5,79 +5,42 @@
 
 using namespace std;
 
+// dicionario de nos
+// as keys sao os nos e os values um array com os nos que se ligam a essa key e o custo da key
 unordered_map<int, vector<int>> links;
 
-// An utility function to add an edge in the tree
-void addEdge(vector<int> adj[], int x, int y)
+void dfs(vector<int> dp[], int src, int par)
 {
-    adj[x].push_back(y);
-    adj[y].push_back(x);
-}
-
-void dfs(vector<int> adj[], vector<int> dp[], int src, int par)
-{
-    for (auto child : adj[src])
+    for (int i = 0; i < (int)links[src].size() - 1; i++)
     {
-        if (child != par)
-            dfs(adj, dp, child, src);
+        if (links[src][i] != par)
+            dfs(dp, links[src][i], src);
     }
 
-    for (auto child : adj[src])
+    for (int i = 0; i < (int)links[src].size() - 1; i++)
     {
-        if (child != par)
+        if (links[src][i] != par)
         {
-            // not including source in the vertex cover
-            dp[src][0] += dp[child][1];
-
-            // including source in the vertex cover
-            dp[src][1] += min(dp[child][1], dp[child][0]);
+            dp[src][0] += dp[links[src][i]][1];
+            dp[src][1] += min(dp[links[src][i]][1], dp[links[src][i]][0]);
         }
     }
 }
 
-// function to find minimum size of vertex cover
-void minSizeVertexCover(vector<int> adj[], int N)
+void minCover(int N)
 {
-    vector<int> dp[N + 1];
+    vector<int> dp[N];
 
-    for (int i = 1; i <= N; i++)
+    for (int i = 0; i < N; i++)
     {
-        // 0 denotes not included in vertex cover
         dp[i].push_back(0);
-
-        // 1 denotes included in vertex cover
         dp[i].push_back(1);
     }
 
-    dfs(adj, dp, 1, -1);
+    dfs(dp, 1, -1);
 
-    // printing minimum size vertex cover
     cout << min(dp[1][0], dp[1][1]) << endl;
 }
-
-/*
-// Driver Code
-int main()
-{
-    // number of nodes in the tree
-    int N = 8;
-
-    // adjacency list representation of the tree
-    vector<int> adj[N + 1];
-
-    addEdge(adj, 1, 2);
-    addEdge(adj, 1, 7);
-    addEdge(adj, 2, 3);
-    addEdge(adj, 2, 6);
-    addEdge(adj, 3, 4);
-    addEdge(adj, 3, 8);
-    addEdge(adj, 3, 5);
-
-    minSizeVertexCover(adj, N);
-
-    return 0;
-}
-*/
 
 int main()
 {
@@ -85,6 +48,7 @@ int main()
     cin.tie(nullptr);
 
     string line;
+
     while (getline(cin, line))
     {
         if (line.empty())
@@ -93,49 +57,45 @@ int main()
         vector<int> nums;
 
         string num;
+
+        if (line.find("-1") != string::npos)
+        {
+            // chama a funcao com o numero de nos como argumento
+            minCover(links.size());
+            links.clear();
+            continue;
+        }
+
+        int space = 0;
+        int key = -1;
         for (int i = 0; i < (int)line.size(); i++)
         {
-            if (line[i] == ' ' || (i + 1 == (int)line.size() - 1 && line[i + 1] == ' '))
+            if (i == (int)line.size() - 1)
+            {
+                num += line[i];
+                links[key].insert(links[key].end(), nums.begin(), nums.end());
+                links[key].push_back(stoi(num));
+                num = "";
+                continue;
+            }
+
+            if (line[i] == ' ' && space == 0)
+            {
+                key = stoi(num);
+                num = "";
+                space = 1;
+                continue;
+            }
+
+            if (line[i] == ' ' && space != 0)
             {
                 nums.push_back(stoi(num));
+                links[stoi(num)] = {key};
                 num = "";
                 continue;
             }
             num += line[i];
         }
-
-        if (nums[0] == -1)
-        {
-            // chama a funcao e reseta o dicionario
-            // minSizeVertexCover(, links.size());
-            for (auto &i : links)
-            {
-                cout << "(" << i.first << ")" << " ";
-                for (auto &j : i.second)
-                    cout << j << " ";
-                cout << endl;
-            }
-            cout << endl;
-            links.clear();
-            continue;
-        }
-
-        for (int i = 1; i < (int)nums.size(); ++i)
-        {
-            if (links.find(nums[0]) == links.end())
-                links[nums[0]] = {nums[i]}; // cria uma key com o no e define as suas ligacoes como values
-            else
-                links[nums[0]].push_back(nums[i]);
-        }
-
-        /*// print do dicionario
-        for (auto &i: links)
-        {
-            cout << "(" << i.first << ")" << " ";
-            for (auto &j : i.second)
-                cout << j << " ";
-            cout << endl;
-        }*/
     }
 
     return 0;
