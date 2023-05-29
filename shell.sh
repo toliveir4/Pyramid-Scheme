@@ -24,7 +24,7 @@ out=$(ls ./testCases/*.txt)
 count=1
 for ef in $out; do
    A="${ef//\.txt/.out_temp}"
-   B="${ef//\.txt/.out}"
+   B="${ef//\.txt/.output}"
    /usr/bin/time -v -o "${TIMEFILE}" ./e.out < "$ef" > "$A"
 
    if diff -q "$A" "$B" >/dev/null; then

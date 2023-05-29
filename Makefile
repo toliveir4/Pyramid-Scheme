@@ -1,7 +1,7 @@
 CPPFILE = pyramidScheme.cpp
 EXE = e.out
 TESTCASE = testCases/mooshak.txt
-TESTOUTPUT = testCases/mooshak_out.txt
+TESTOUTPUT = testCases/mooshak.output
 OUTPUT = testCases/output.txt
 DIFF = testCases/diff.txt
 TIMEFILE = testCases/timefile

@@ -56,3 +56,7 @@
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+*.out_temp
+
+timefile
