@@ -22,6 +22,23 @@ public:
 // dicionario em que a key e o id do no e o value um ponteiro para o no
 unordered_map<int, Member*> members;
 
+// escolhe a melhor opcao consoante o valor minimo de vertices e, no caso de empate, o custo maximo
+void checkBestOption(Member* m, int sizeWith, int totalCostWith, int sizeWithout, int totalCostWithout) {
+    if (sizeWithout < sizeWith) {
+        m->vertexCover = sizeWithout;
+        m->totalCost = totalCostWithout;
+    }
+    else if (sizeWith < sizeWithout) {
+        m->vertexCover = sizeWith;
+        m->totalCost = totalCostWith;
+    }
+    else {
+        m->vertexCover = sizeWithout;
+        m->totalCost = max(totalCostWith, totalCostWithout);
+    }
+}
+
+
 pair<int, int> minSizeCover(Member* m) {
     // verifica se o no tem filhos
     if (m->recruits.empty())
@@ -35,6 +52,7 @@ pair<int, int> minSizeCover(Member* m) {
     // caso em que a raiz e contada
     int sizeWith = 1;
     int totalCostWith = m->cost;
+
     for (auto& r : m->recruits) {
         pair<int, int> aux = minSizeCover(members[r]);
         sizeWith += aux.first;
@@ -44,9 +62,11 @@ pair<int, int> minSizeCover(Member* m) {
     // caso em que a raiz nao e contada
     int sizeWithout = 0;
     int totalCostWithout = 0;
+
     for (auto& r : m->recruits) {
         sizeWithout += 1;
         totalCostWithout += members[r]->cost;
+
         for (auto& rr : members[r]->recruits) {
             pair<int, int> aux = minSizeCover(members[rr]);
             sizeWithout += aux.first;
@@ -54,19 +74,7 @@ pair<int, int> minSizeCover(Member* m) {
         }
     }
 
-    // escolhe a melhor opcao consoante o valor minimo de vertices e, no caso de empate, o custo maximo
-    if (sizeWithout < sizeWith) {
-        m->vertexCover = sizeWithout;
-        m->totalCost = totalCostWithout;
-    }
-    else if (sizeWith < sizeWithout) {
-        m->vertexCover = sizeWith;
-        m->totalCost = totalCostWith;
-    }
-    else {
-        m->vertexCover = sizeWithout;
-        m->totalCost = max(totalCostWith, totalCostWithout);
-    }
+    checkBestOption(m, sizeWith, totalCostWith, sizeWithout, totalCostWithout);
 
     return { m->vertexCover, m->totalCost };
 }
@@ -117,8 +125,10 @@ int main() {
                 num = "";
                 continue;
             }
+
             num += line[i];
         }
     }
+
     return 0;
 }
