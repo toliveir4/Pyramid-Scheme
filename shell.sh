@@ -20,7 +20,7 @@ g++ -std=c++17 -Wall -Wextra -O2 -o e.out pyramidScheme.cpp -lm
 
 TIMEFILE="timefile"
 
-out=$(ls ./testCases/*.txt)
+out=$(ls -v ./testCases/*.txt)
 count=1
 for ef in $out; do
    A="${ef//\.txt/.out_temp}"
